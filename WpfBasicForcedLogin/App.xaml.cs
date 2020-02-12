@@ -38,6 +38,7 @@ namespace WpfBasicForcedLogin
                     .ConfigureServices(ConfigureServices)
                     .Build();
 
+            
             await _host.StartAsync();
         }
 
@@ -49,12 +50,21 @@ namespace WpfBasicForcedLogin
             services.AddHostedService<ApplicationHostService>();
 
             // Core Services
-            //services.AddSingleton<HttpClient>(); // reusable HttpClient for graph calls
+
+            // using http for graph
+            //services.AddHttpClient("msgraph", x =>
+            //{
+            //    x.BaseAddress = new System.Uri("https://graph.microsoft.com/v1.0/");
+            //});
             //services.AddSingleton<IMicrosoftGraphService, MicrosoftGraphService>();
+
             services.AddSingleton<IIdentityService, IdentityService>();
+
+            // using graph client
             services.AddSingleton<Graph.IAuthenticationProvider, IdentityServiceGraphTokenProvider>();
             services.AddSingleton<Graph.IGraphServiceClient, Graph.GraphServiceClient>();
             services.AddSingleton<IMicrosoftGraphService, MicrosoftGraphClientService>();
+
             services.AddSingleton<IFileService, FileService>();
 
             // Services

@@ -7,7 +7,8 @@ namespace WpfBasicForcedLogin.Core.Services
 {
     public class IdentityServiceGraphTokenProvider : GraphClient.IAuthenticationProvider
     {
-        private IIdentityService _identityService;
+        private readonly IIdentityService _identityService;
+
         public IdentityServiceGraphTokenProvider(IIdentityService identityService)
         {
             _identityService = identityService;

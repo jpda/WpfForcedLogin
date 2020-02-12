@@ -8,6 +8,9 @@ using WpfBasicForcedLogin.Core.Helpers;
 
 namespace WpfBasicForcedLogin.Core.Services
 {
+    // this service uses the graph client SDK that we ship - i understand that part of the sample
+    // is to show how to use an access token against an arbitrary API, using the graph as an example 
+    // this shows an alternate mechanism for the graph
     public class MicrosoftGraphClientService : IMicrosoftGraphService
     {
         private readonly GraphClient.IGraphServiceClient _client;
