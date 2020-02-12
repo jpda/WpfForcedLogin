@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Net.Http;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
@@ -6,7 +7,6 @@ using System.Windows.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
 using WpfBasicForcedLogin.Contracts.Services;
 using WpfBasicForcedLogin.Contracts.Views;
 using WpfBasicForcedLogin.Core.Contracts.Services;
@@ -15,6 +15,7 @@ using WpfBasicForcedLogin.Models;
 using WpfBasicForcedLogin.Services;
 using WpfBasicForcedLogin.ViewModels;
 using WpfBasicForcedLogin.Views;
+using Graph = Microsoft.Graph;
 
 namespace WpfBasicForcedLogin
 {
@@ -48,8 +49,12 @@ namespace WpfBasicForcedLogin
             services.AddHostedService<ApplicationHostService>();
 
             // Core Services
-            services.AddSingleton<IMicrosoftGraphService, MicrosoftGraphService>();
+            //services.AddSingleton<HttpClient>(); // reusable HttpClient for graph calls
+            //services.AddSingleton<IMicrosoftGraphService, MicrosoftGraphService>();
             services.AddSingleton<IIdentityService, IdentityService>();
+            services.AddSingleton<Graph.IAuthenticationProvider, IdentityServiceGraphTokenProvider>();
+            services.AddSingleton<Graph.IGraphServiceClient, Graph.GraphServiceClient>();
+            services.AddSingleton<IMicrosoftGraphService, MicrosoftGraphClientService>();
             services.AddSingleton<IFileService, FileService>();
 
             // Services

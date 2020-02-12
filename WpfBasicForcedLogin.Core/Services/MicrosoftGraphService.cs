@@ -21,9 +21,11 @@ namespace WpfBasicForcedLogin.Core.Services
         private const string _graphAPIEndpoint = "https://graph.microsoft.com/v1.0/";
         private const string _apiServiceMe = "me/";
         private const string _apiServiceMePhoto = "me/photo/$value";
+        private readonly HttpClient _client;
 
-        public MicrosoftGraphService()
+        public MicrosoftGraphService(HttpClient client)
         {
+            _client = client;
         }
 
         public async Task<User> GetUserInfoAsync(string accessToken)
@@ -59,19 +61,16 @@ namespace WpfBasicForcedLogin.Core.Services
         {
             try
             {
-                using (var httpClient = new HttpClient())
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                var response = await _client.SendAsync(request);
+                if (response.IsSuccessStatusCode)
                 {
-                    var request = new HttpRequestMessage(HttpMethod.Get, url);
-                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                    var response = await httpClient.SendAsync(request);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        return response.Content;
-                    }
-                    else
-                    {
-                        // TODO WTS: Please handle other status codes as appropriate to your scenario
-                    }
+                    return response.Content;
+                }
+                else
+                {
+                    // TODO WTS: Please handle other status codes as appropriate to your scenario
                 }
             }
             catch (HttpRequestException)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@ using WpfBasicForcedLogin.Contracts.Services;
 using WpfBasicForcedLogin.Contracts.Views;
 using WpfBasicForcedLogin.Core.Contracts.Services;
 using WpfBasicForcedLogin.Models;
+using WpfBasicForcedLogin.Strings;
 using WpfBasicForcedLogin.ViewModels;
 
 namespace WpfBasicForcedLogin.Services
@@ -44,7 +46,11 @@ namespace WpfBasicForcedLogin.Services
             await InitializeAsync();
 
             // https://aka.ms/msal-net-token-cache-serialization
-            var storageCreationProperties = new StorageCreationPropertiesBuilder(_config.IdentityCacheFileName, _config.IdentityCacheDirectoryName, _config.IdentityClientId).Build();
+            // this generates a file-system safe directory name to stick the cache in - or use something like Resources.AppDisplayName
+            // should also consider this root dir for other configuration data
+            var safeAppDirectoryName = System.IO.Path.GetInvalidFileNameChars().Aggregate(typeof(App).Assembly.GetName().Name, (current, c) => current.Replace(c, '-'));
+            var rootCacheDirectory = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), safeAppDirectoryName, _config.IdentityCacheDirectoryName);
+            var storageCreationProperties = new StorageCreationPropertiesBuilder(_config.IdentityCacheFileName, rootCacheDirectory, _config.IdentityClientId).Build();
             var cacheHelper = await MsalCacheHelper.CreateAsync(storageCreationProperties).ConfigureAwait(false);
             _identityService.InitializeWithAadAndPersonalMsAccounts(_config.IdentityClientId, "http://localhost", cacheHelper);
             var silentLoginSuccess = await _identityService.AcquireTokenSilentAsync();
